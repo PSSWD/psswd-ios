@@ -26,10 +26,10 @@ class MainSettingsDevices: UITableViewController, UITableViewDelegate, UIActionS
 	
 	func loadData(){
 		API.call("device.getList", params: 0, callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			switch code {
 			case 0:
-				self.devices = rdata["data"] as [[String: AnyObject]]
+				self.devices = rdata["data"] as! [[String: AnyObject]]
 				
 				self.isReady = true
 				self.tableView.reloadData()
@@ -60,20 +60,20 @@ class MainSettingsDevices: UITableViewController, UITableViewDelegate, UIActionS
 		
 		let data = devices[indexPath.row]
 
-		var title = data["app_title"] as String
-		let app_about = data["app_about"] as String
+		var title = data["app_title"] as! String
+		let app_about = data["app_about"] as! String
 		if "" != app_about { title += " (\(app_about))" }
 		cell.textLabel?.text = title
 
-		var detail = Funcs.parseTime(data["session_create"] as Int) + "\n"
-		if Crypto.SHA1("S6TXiGI?.u39a.ck48K8Hoq44wOtMVQu" + Storage.getString("device_id")!).toHex() == data["device_id_hash"] as String
+		var detail = Funcs.parseTime(data["session_create"] as! Int) + "\n"
+		if Crypto.SHA1("S6TXiGI?.u39a.ck48K8Hoq44wOtMVQu" + Storage.getString("device_id")!).toHex() == data["device_id_hash"] as! String
 		{
 			self.currentDevice = indexPath.row
 			detail += "Вы сейчас смотрите на него"
 		}
 		else
 		{
-			detail += data["session_ip"] as String
+			detail += data["session_ip"] as! String
 		}
 		cell.detailTextLabel?.text = detail
 		cell.detailTextLabel?.textColor = UIColor.grayColor()
@@ -103,8 +103,8 @@ class MainSettingsDevices: UITableViewController, UITableViewDelegate, UIActionS
 
 			let data = self.devices[self.selectedRow]
 			
-			API.call("device.revoke", params: data["device_id_hash"] as String, callback: { rdata in
-				let code = rdata["code"] as Int
+			API.call("device.revoke", params: data["device_id_hash"] as! String, callback: { rdata in
+				let code = rdata["code"] as! Int
 				switch code {
 				case 0:
 					Funcs.message("Доступ успешно отозван. Приложение больше не имеет доступа к этому аккаунту.")

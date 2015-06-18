@@ -93,7 +93,7 @@ class API
 				var data_toenc = Crypto.Bytes(randomWithLength: 16).append(answer_key!).append(data_bytes)
 				//println(data_toenc.asArray())
 				rsa_object["hash"] = data_toenc.getSHA1()
-				for var i = 0; i < data_toenc.count; i+=chunkLength {
+				for var i = 0; i < data_toenc.length; i+=chunkLength {
 					var chunk = data_toenc.slice(i, length: chunkLength)
 					//println("CHUNK : \(chunk.asArray())")
 					rsa_object_chunks.append( Crypto.RSA.encrypt(chunk) )
@@ -104,7 +104,7 @@ class API
 				req_bytes = Schemas.utils.dataToSchemaBytes(0x1000, input_data: rsa_object)
 			default:
 				var data_enc = Crypto.Cryptoblender.encrypt(schema_id == nil ? Crypto.Bytes() : Schemas.utils.dataToSchemaBytes(schema_id!, input_data: params), withKey: session_key)
-				req_bytes = Crypto.Bytes(fromHexString: Storage.get("device_id") as String).concat(data_enc)
+				req_bytes = Crypto.Bytes(fromHexString: Storage.get("device_id") as! String).concat(data_enc)
 		}
 		println("REQUEST TO \(method)")
         //println("POST DATA: \( req_bytes.asArray() )")
@@ -120,8 +120,8 @@ class API
 			dispatch_async(dispatch_get_main_queue(), {
 				UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 				if let response = _response as? NSHTTPURLResponse {
-					//println(data)
 					let rdata_bytes = Crypto.Bytes(fromNSData: data!)
+					//println("rdata_bytes : \(rdata_bytes)")
 					var rdata_bytes_dec = Crypto.Bytes()
 					var rdata: AnyObject = ""
 					if let contentType = response.allHeaderFields["Content-Type"] as? String {
@@ -143,23 +143,23 @@ class API
 								assert(false, "Invalid contentTypeExt: '\(contentTypeExt)'.")
 						}
 						//println(rdata)
-						var rdata_code = rdata["code"] as Int
+						var rdata_code = rdata["code"] as! Int
 						switch rdata_code {
 							case 0:
 								if method == "device.auth" {
-									session_key = rdata["data"] as Crypto.Bytes
+									session_key = rdata["data"] as! Crypto.Bytes
 								}
 								else if method == "reg.confirm" {
 									if let rdata_data = rdata["data"] as? [String: AnyObject]
 									{
-										session_key = rdata_data["session_key"] as Crypto.Bytes
+										session_key = rdata_data["session_key"] as! Crypto.Bytes
 									}
 								}
 							
 							case 603, 605:
 								Storage.clear()
 								Funcs.message("К сожалению, это устройство больше не имеет доступа к PSSWD. Пройдите авторизацию с мастер-паролем заново.", callback: { (index: Int) -> Void in
-									var vc = Funcs.storyboard.instantiateViewControllerWithIdentifier("AuthEmailVC") as UITableViewController
+									var vc = Funcs.storyboard.instantiateViewControllerWithIdentifier("AuthEmailVC") as! UITableViewController
 									Funcs.navigationController!.setViewControllers([ vc ], animated: false)
 								})
 								return
@@ -202,7 +202,7 @@ class API
 	
 	class func unknownCode(data: [String: AnyObject])
 	{
-		let code = data["code"] as Int
+		let code = data["code"] as! Int
 		Funcs.message("Неизвестный код ответа.\nКод #\(code)")
 		println(data)
 	}

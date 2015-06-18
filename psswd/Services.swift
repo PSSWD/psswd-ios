@@ -48,7 +48,7 @@ class Services
 		
 		if needUpdate
 		{
-			Funcs.jsonData.update("services", {
+			Funcs.jsonData.update("services", callback: {
 				self.create(needUpdate: false)
 			})
 		}
@@ -58,7 +58,7 @@ class Services
 	{
 		for el in classVar.services_list
 		{
-			if service_id == el["id"] as String
+			if service_id == el["id"] as! String
 			{
 				return el
 			}

@@ -36,7 +36,6 @@
 		A5D9D4571A58351B0076D38F /* SystemPasscodeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D9D4561A58351B0076D38F /* SystemPasscodeVC.swift */; };
 		A5F0433C1A75346A00FFA47D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5F0433B1A75346A00FFA47D /* LaunchScreen.xib */; };
 		A5FCEC571A4986FF0099A4DB /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5FCEC551A4986FF0099A4DB /* API.swift */; };
-		A5FCEC581A4986FF0099A4DB /* jsencrypt.js in Resources */ = {isa = PBXBuildFile; fileRef = A5FCEC561A4986FF0099A4DB /* jsencrypt.js */; };
 		A5FCEC5A1A498CE50099A4DB /* schemas.json in Resources */ = {isa = PBXBuildFile; fileRef = A5FCEC591A498CE50099A4DB /* schemas.json */; };
 		A5FF20081A51940C00A68C6B /* ObjC_MTRandom.m in Sources */ = {isa = PBXBuildFile; fileRef = A5FF20071A51940B00A68C6B /* ObjC_MTRandom.m */; };
 		A5FF200B1A51A2E100A68C6B /* AuthEmailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5FF200A1A51A2E100A68C6B /* AuthEmailVC.swift */; };
@@ -89,7 +88,6 @@
 		A5F0433B1A75346A00FFA47D /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		A5F976871A63C89D00D13E37 /* ObjC_Crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjC_Crypto.h; sourceTree = "<group>"; };
 		A5FCEC551A4986FF0099A4DB /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
-		A5FCEC561A4986FF0099A4DB /* jsencrypt.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = jsencrypt.js; sourceTree = "<group>"; };
 		A5FCEC591A498CE50099A4DB /* schemas.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schemas.json; sourceTree = "<group>"; };
 		A5FF20071A51940B00A68C6B /* ObjC_MTRandom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC_MTRandom.m; sourceTree = "<group>"; };
 		A5FF20091A51943600A68C6B /* ObjC_MTRandom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjC_MTRandom.h; sourceTree = "<group>"; };
@@ -145,7 +143,6 @@
 				A5FCEC591A498CE50099A4DB /* schemas.json */,
 				A5C600641A5EF08F00EAE859 /* services.json */,
 				A5C600661A5EF0C100EAE859 /* gradients.json */,
-				A5FCEC561A4986FF0099A4DB /* jsencrypt.js */,
 				A51BA20A1A6D20C00062F790 /* public_key.der */,
 				A50ACD5B1A45C21F006AA575 /* psswd.xcdatamodeld */,
 				A50ACD571A45C21F006AA575 /* Supporting Files */,
@@ -325,7 +322,6 @@
 				A5585F621A49D3F1004AD09A /* Images.xcassets in Resources */,
 				A5F0433C1A75346A00FFA47D /* LaunchScreen.xib in Resources */,
 				A5C600671A5EF0C100EAE859 /* gradients.json in Resources */,
-				A5FCEC581A4986FF0099A4DB /* jsencrypt.js in Resources */,
 				A51BA20B1A6D20C00062F790 /* public_key.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

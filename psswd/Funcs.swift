@@ -31,7 +31,7 @@ class Funcs
 	}
 	class func getStartupPasscodeScreen() -> SystemPasscodeVC
 	{
-		var vc = storyboard.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as SystemPasscodeVC
+		var vc = storyboard.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as! SystemPasscodeVC
 		
 		vc.topTitle = "Введите пароль"
 		
@@ -54,16 +54,16 @@ class Funcs
 			] as [String: AnyObject]
 
 			API.call("device.auth", params: requestParams, callback: { rdata in
-				let code = rdata["code"] as Int
+				let code = rdata["code"] as! Int
 				
 				switch code {
 					case 0:
 						API.code_user = code_user
 					
-						var vc = self.storyboard.instantiateViewControllerWithIdentifier("MainPassListVC") as UITableViewController
+						var vc = self.storyboard.instantiateViewControllerWithIdentifier("MainPassListVC") as! UITableViewController
 						self.navigationController!.setViewControllers([ vc ], animated: false)
 					case 606:
-						var auth_attempts = rdata["data"] as Int
+						var auth_attempts = rdata["data"] as! Int
 						vc.clear()
 						vc.shakeDots()
 						if 1 == auth_attempts {
@@ -73,7 +73,7 @@ class Funcs
 						Storage.clear()
 						API.code_user = nil
 						Funcs.message("Вы несколько раз подряд ввели неверный пароль. В целях безопасности мы заблокировали приложение на этом устройстве. Для разблокировки пройдите авторизацию заново.", callback: { index in
-							var vc = self.storyboard.instantiateViewControllerWithIdentifier("AuthEmailVC") as UITableViewController
+							var vc = self.storyboard.instantiateViewControllerWithIdentifier("AuthEmailVC") as! UITableViewController
 							self.navigationController!.setViewControllers([ vc ], animated: false)
 						})
 					default:
@@ -87,11 +87,12 @@ class Funcs
 	
 	private class UIBAlertView: UIAlertView, UIAlertViewDelegate {
 		var callback: ((Int) -> Void)? = nil
-		private override func show() {
+		override func show() {
 			super.show()
 			self.delegate = self
 		}
-		private func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+		func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+			println(buttonIndex)
 			if nil != callback { callback!(buttonIndex) }
 		}
 	}
@@ -155,7 +156,7 @@ class Funcs
 	{
 		class func getPath() -> String
 		{
-			let path = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String) + "/loadedImages/"
+			let path = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String) + "/loadedImages/"
 			var fm = NSFileManager.defaultManager()
 			if !fm.fileExistsAtPath(path)
 			{
@@ -199,12 +200,12 @@ class Funcs
 			
 			if nil == contents { return }
 			
-			for filename in contents as [String]
+			for filename in contents as! [String]
 			{
 				let attrs = fm.attributesOfItemAtPath(path + filename, error: nil)
 				if attrs != nil
 				{
-					let date = attrs![NSFileCreationDate] as NSDate
+					let date = attrs![NSFileCreationDate] as! NSDate
 					let interval = NSDate().timeIntervalSince1970 - date.timeIntervalSince1970
 					//println("created \(interval / 60 / 60 / 24) days ago")
 					
@@ -226,10 +227,10 @@ class Funcs
 			if nil == contents { return -1 }
 			
 			var size: Int64 = 0
-			for filename in contents as [String]
+			for filename in contents as! [String]
 			{
 				let attrs = fm.attributesOfItemAtPath(path + filename, error: nil)
-				let fileSize = attrs![NSFileSize] as NSNumber
+				let fileSize = attrs![NSFileSize] as! NSNumber
 				size += Int(fileSize)
 			}
 			return size
@@ -243,7 +244,7 @@ class Funcs
 
 			if nil == contents { return }
 			
-			for filename in contents as [String]
+			for filename in contents as! [String]
 			{
 				fm.removeItemAtPath(path + filename, error: nil)
 			}
@@ -253,7 +254,7 @@ class Funcs
 	class jsonData
 	{
 		private class func getPath() -> String {
-			let path = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String) + "/jsonData/"
+			let path = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String) + "/jsonData/"
 			,	fm = NSFileManager.defaultManager()
 			if !fm.fileExistsAtPath(path)
 			{
@@ -304,10 +305,10 @@ class Funcs
 						let json = parsedData! as? [String: AnyObject]
 						if nil != json
 						{
-							let code = json!["code"] as Int
+							let code = json!["code"] as! Int
 							if code == 0
 							{
-								let json_data = json!["data"] as [String: AnyObject]
+								let json_data = json!["data"] as! [String: AnyObject]
 								let path = self.getPath() + "\(name).json"
 								let data: NSData = NSJSONSerialization.dataWithJSONObject(json_data, options: nil, error: nil)!
 								data.writeToFile(path, atomically: true)
@@ -404,7 +405,7 @@ class Funcs
 	{
 		class func show()
 		{
-			let vc = Funcs.storyboard.instantiateViewControllerWithIdentifier("BlockVC") as UIViewController
+			let vc = Funcs.storyboard.instantiateViewControllerWithIdentifier("BlockVC") as! UIViewController
 			vc.modalTransitionStyle = UIModalTransitionStyle.CrossDissolve
 			Funcs.ActivityObserver.sharedInstance().enabled = false
 			Funcs.navigationController?.presentViewController(vc, animated: true, completion: nil)

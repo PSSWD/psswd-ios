@@ -46,16 +46,16 @@ class SystemPasscodeVC: UIViewController
 	@IBAction func keypadButtonPressed(sender: UIButton) {
 		sender.backgroundColor = UIColor.clearColor()
 		
-		if countElements(code) >= 6 { return }
+		if count(code) >= 6 { return }
 		code = code + sender.titleForState(UIControlState.Normal)!
 		
 		updateDots()
 	}
 	private func updateDots()
 	{
-		for (i, el) in enumerate(self.dotsView.subviews as [UIView!])
+		for (i, el) in enumerate(self.dotsView.subviews as! [UIView!])
 		{
-			if countElements(code) <= i
+			if count(code) <= i
 			{
 				el.backgroundColor = UIColor.clearColor()
 			}
@@ -65,7 +65,7 @@ class SystemPasscodeVC: UIViewController
 			}
 		}
 		
-		if countElements(code) == 0
+		if count(code) == 0
 		{
 			if "" == buttonRightTitle
 			{
@@ -84,12 +84,12 @@ class SystemPasscodeVC: UIViewController
 			buttonRight.setTitle("Удалить", forState: UIControlState.Normal)
 			var rightPx = buttonRight.frame.origin.x + buttonRight.frame.size.width
 			buttonRightAction = {
-				self.code = self.code.substringToIndex( advance(self.code.startIndex, countElements(self.code) - 1) )
+				self.code = self.code.substringToIndex( advance(self.code.startIndex, count(self.code) - 1) )
 				self.updateDots()
 			}
 		}
 		
-		if countElements(code) >= 6
+		if count(code) >= 6
 		{
 			onSubmit(code: code)
 		}
@@ -119,7 +119,7 @@ class SystemPasscodeVC: UIViewController
 					button.clipsToBounds = true
 				}
 			}
-			for el in self.dotsView.subviews as [ UIView! ]
+			for el in self.dotsView.subviews as! [ UIView! ]
 			{
 				el.backgroundColor = UIColor.clearColor()
 				el.layer.cornerRadius = el.frame.size.width / 2

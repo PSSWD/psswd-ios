@@ -17,7 +17,7 @@ class InitViewController: UIViewController {
 		
 		//Storage.clear(); Storage.set("daniil@kirick.me", forKey: "email"); return;
 		
-		Funcs.imageFolder.clean()
+		//Funcs.imageFolder.clean()
 		//Funcs.imageFolder.removeAll()
 		
 		Schemas.create()
@@ -35,7 +35,7 @@ class InitViewController: UIViewController {
 		}
 		else
 		{
-			vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthEmailVC") as UITableViewController
+			vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthEmailVC") as! UITableViewController
 		}
 		
 		self.navigationController!.setViewControllers([ vc ], animated: false)

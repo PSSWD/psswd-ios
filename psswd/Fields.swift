@@ -19,10 +19,10 @@ class Fields
 		for v in srv_fields
 		{
 			var _v = v
-			let v_type = v["type"] as String
+			let v_type = v["type"] as! String
 			if "_" != Array(v_type)[0]
 			{
-				var def = classVar.defaultFields[v_type] as [String: AnyObject]
+				var def = classVar.defaultFields[v_type] as! [String: AnyObject]
 				for (k2, v2) in v { def[k2] = v2 }
 				_v = def
 			}
@@ -40,7 +40,7 @@ class Fields
 		
 		for v in data_fields
 		{
-			if nil == getByType(_fields, type: v["type"] as String)
+			if nil == getByType(_fields, type: v["type"] as! String)
 			{
 				_fields.append(v)
 			}
@@ -55,7 +55,7 @@ class Fields
 		
 		for v in list
 		{
-			if v["type"] as String == type
+			if v["type"] as! String == type
 			{
 				_field = v
 				break

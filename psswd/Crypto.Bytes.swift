@@ -14,8 +14,8 @@ extension Crypto
 		override var description: String
 		{
 			var res = ""
-			for c in data { res += (countElements(res) == 0 ? "" : ", ") + "\(c)" }
-			return "Crypto.Bytes( " + res + (countElements(res) == 0 ? "" : " ") + ")"
+			for c in data { res += (count(res) == 0 ? "" : ", ") + "\(c)" }
+			return "Crypto.Bytes( " + res + (count(res) == 0 ? "" : " ") + ")"
 		}
 		override init()
 		{
@@ -54,10 +54,10 @@ extension Crypto
 		{
 			data = Crypto.Bytes(fromHexString: NSString(format:"%2X", number) as String).asArray()
 		}
-		init(fromHexString hex: String)
+		init(fromHexString _hex: String)
 		{
-			var hex = hex
-			if countElements(hex) % 2 == 1 { hex = "0" + hex }
+			var hex = _hex
+			if count(hex) % 2 == 1 { hex = "0" + hex }
 			var syms = Array(hex)
 			var res: [UInt8] = []
 			for var i = 0; i < syms.count; i += 2 {
@@ -65,6 +65,7 @@ extension Crypto
 				res.append( UInt8(num) )
 			}
 			data = res
+			count(hex)
 		}
 		init(randomWithLength length: Int)
 		{
@@ -73,7 +74,7 @@ extension Crypto
 				data.append( UInt8( MTRandom().randomUInt32From(0, to: 255) ) )
 			}
 		}
-		var count: Int { return data.count }
+		var length: Int { return data.count }
 		func asArray() -> [UInt8] {
 			return data
 		}
@@ -115,26 +116,28 @@ extension Crypto
 		func getSHA1() -> Bytes {
 			return Crypto.SHA1( self.toNSData() )
 		}
+		func getSHA256() -> Bytes {
+			return Crypto.SHA256( self.toNSData() )
+		}
 		func toHex() -> String {
 			var g = ""
-			for c in 0 ..< data.count {
-				g += NSString(format:"%02x", data[c]) as String
+			for num in data {
+				g += NSString(format:"%02x", num) as String
 			}
 			return g
 		}
 		func toNSData() -> NSData {
-			var bts: [Byte] = [] as [Byte]
-			for i in data { bts.append( Byte(i) ) }
-			return NSData(bytes: bts, length: data.count)
+			var bts = [UInt8]()
+			for i in data { bts.append(i) }
+			return NSData(bytes: &bts, length: data.count)
 		}
 		func toSymbols(oneByte: Bool = false) -> String {
 			var g = ""
 			if oneByte {
-				for i in 0 ..< data.count {
-					g += String(UnicodeScalar( data[i] ))
+				for _byte in data {
+					g += String( UnicodeScalar(_byte) )
 				}
-			}
-			else {
+			} else {
 				if data.count % 2 == 1 {
 					NSException(name: "Wrong bytes", reason: "Count of bytes must be even.", userInfo: nil)
 				}

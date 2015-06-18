@@ -31,24 +31,24 @@ class AuthEmailVC: UITableViewController
 				Storage.set(email, forKey: "email")
 				self.emailField.text = ""
 			}
-			var code = rdata["code"] as Int
+			var code = rdata["code"] as! Int
 			switch code {
 				case 0:
-					var user_status = rdata["data"] as Int
+					var user_status = rdata["data"] as! Int
 					switch user_status {
 						case 0:
-							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSigninMasterpassVC") as UIViewController
+							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSigninMasterpassVC") as! UIViewController
 							self.navigationController!.pushViewController(vc, animated: true)
 							success()
 						case 1:
-							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupConfirmVC") as UIViewController
+							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupConfirmVC") as! UIViewController
 							self.navigationController!.pushViewController(vc, animated: true)
 							success()
 						default:
 							UIAlertView(title: "Ошибка", message: "Неизвестный статус пользователя.", delegate: self, cancelButtonTitle: "OK").show()
 					}
 				case 301:
-					var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupMasterpassVC") as UITableViewController
+					var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupMasterpassVC") as! UITableViewController
 					self.navigationController!.pushViewController(vc, animated: true)
 					success()
 				default:

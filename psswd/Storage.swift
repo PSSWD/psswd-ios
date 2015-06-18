@@ -48,7 +48,7 @@ class Storage
 	}
 	class func clear(){
 		for (key, value) in defaults().dictionaryRepresentation() {
-			remove(key as String)
+			remove(key as! String)
 		}
 	}
 }

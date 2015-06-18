@@ -51,7 +51,7 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 	func loadData()
 	{
 		API.call("passwords.getById", params: pass_id, callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			switch code {
 			case 0:
 				var key = Crypto.Bytes(fromString: API.code_user!)
@@ -62,25 +62,25 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 				
 				if let rdata_data = rdata["data"] as? [String: AnyObject]
 				{
-					let info_bytes_enc = rdata_data["info_enc"] as Crypto.Bytes
+					let info_bytes_enc = rdata_data["info_enc"] as! Crypto.Bytes
 					let info_bytes_dec = Crypto.Cryptoblender.decrypt(info_bytes_enc, withKey: key)
-					self.pass_info = Schemas.utils.schemaBytesToData( info_bytes_dec ) as [String: AnyObject]
+					self.pass_info = Schemas.utils.schemaBytesToData( info_bytes_dec ) as! [String: AnyObject]
 					//println(self.pass_info)
 					
-					let data_bytes_enc = rdata_data["data_enc"] as Crypto.Bytes
+					let data_bytes_enc = rdata_data["data_enc"] as! Crypto.Bytes
 					let data_bytes_dec = Crypto.Cryptoblender.decrypt(data_bytes_enc, withKey: key)
-					self.pass_data = Schemas.utils.schemaBytesToData( data_bytes_dec ) as [String: AnyObject]
+					self.pass_data = Schemas.utils.schemaBytesToData( data_bytes_dec ) as! [String: AnyObject]
 					//println(self.pass_data)
 					
-					self.srv_id = self.pass_info["service_id"] as String
+					self.srv_id = self.pass_info["service_id"] as! String
 					self.srv = Services.getById(self.srv_id)
 					//println(self.srv)
 					
-					self.pass_unitedFields = Fields.uniteFields(self.srv["fields"] as [ [String: AnyObject] ], data_fields: self.pass_data["fields"]  as [ [String: AnyObject] ])
+					self.pass_unitedFields = Fields.uniteFields(self.srv["fields"] as! [ [String: AnyObject] ], data_fields: self.pass_data["fields"]  as! [ [String: AnyObject] ])
 					//println(self.pass_unitedFields)
 					
-					let view_title_text = self.pass_info["title"] as String
-					self.pass_title = view_title_text == "" ? self.srv["title"] as String : view_title_text
+					let view_title_text = self.pass_info["title"] as! String
+					self.pass_title = view_title_text == "" ? self.srv["title"] as! String : view_title_text
 					
 					if ("default" == self.srv_id || nil != self.srv["icon"] as? Int)
 					{
@@ -142,8 +142,8 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 			cell.userInteractionEnabled = false
 			
 			var view_title_text = UILabel(frame: CGRectMake(16, 16, cell.frame.width - 32, 25))
-			let view_title_text_text = pass_info["title"] as String
-			view_title_text.text = view_title_text_text == "" ? srv["title"] as String : view_title_text_text
+			let view_title_text_text = pass_info["title"] as! String
+			view_title_text.text = view_title_text_text == "" ? srv["title"] as! String : view_title_text_text
 			view_title_text.font = UIFont(name: "HelveticaNeue-Light", size: 21)
 			
 			//view_title_text.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.25)
@@ -236,11 +236,11 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 					view_title_shadow.addSubview(view_title_text)
 				}
 
-				let srv_icon = srv["icon"] as String
+				let srv_icon = srv["icon"] as! String
 				var icon_url = srv_icon == "default" ? Services.getDefaultIconPath(srv_id) : srv_icon
 				if nil != srv["iconBig"]
 				{
-					let srv_icon = srv["iconBig"] as String
+					let srv_icon = srv["iconBig"] as! String
 					icon_url = srv_icon == "default" ? Services.getDefaultIconBigPath(srv_id) : srv_icon
 				}
 				Funcs.imageFolder.loadImage(icon_url, callback: { image in
@@ -291,7 +291,7 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 			{
 				view_value.text = data_field_value
 				
-				if "site_url" == data_field["type"] as String
+				if "site_url" == data_field["type"] as! String
 				{
 					cell.contentView.tag = 2
 				}
@@ -321,11 +321,11 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 			break
 		case 1:
 			// password object
-			let label = contentView.subviews[1] as UILabel
+			let label = contentView.subviews[1] as! UILabel
 			menu.addButtonWithTitle((label.text == hiddenPass ? "Показать" : "Скрыть") + " пароль")
 		case 2:
 			// go to url
-			UIApplication.sharedApplication().openURL(NSURL(string: (contentView.subviews[1] as UILabel).text!)!)
+			UIApplication.sharedApplication().openURL(NSURL(string: (contentView.subviews[1] as! UILabel).text!)!)
 			return
 		default: break
 		}
@@ -342,11 +342,11 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 		switch buttonIndex
 		{
 		case 0:
-			var textToCopy = (contentView.subviews[1] as UILabel).text!
+			var textToCopy = (contentView.subviews[1] as! UILabel).text!
 			if contentView.tag == 1
 			{
 				var data_field = self.pass_unitedFields[self.selectedIndexPath.row - 1]
-				textToCopy = data_field["value"] as String
+				textToCopy = data_field["value"] as! String
 			}
 			UIPasteboard.generalPasteboard().string = textToCopy
 			
@@ -354,16 +354,16 @@ class MainPassDetailVC: UITableViewController, UITableViewDelegate, UIActionShee
 			
 			Storage.set(textToCopy, forKey: "saved_pasteboard_content")
 			Storage.set(Int(NSDate().timeIntervalSince1970) + pasteboardTimeout, forKey: "saved_pasteboard_expires")
-			var time = dispatch_time(DISPATCH_TIME_NOW, Int64((pasteboardTimeout + 1) * NSEC_PER_SEC))
+			var time = dispatch_time(DISPATCH_TIME_NOW, Int64((pasteboardTimeout + 1) * Int64(NSEC_PER_SEC)))
 			dispatch_after(time, dispatch_get_main_queue(), {
 				Funcs.observePasteboard()
 				return
-			});
+			})
 		case 1:
 			if contentView.tag == 1
 			{
 				var data_field = self.pass_unitedFields[self.selectedIndexPath.row - 1]
-				let label = contentView.subviews[1] as UILabel
+				let label = contentView.subviews[1] as! UILabel
 				if label.text == hiddenPass
 				{
 					label.text = data_field["value"] as? String

@@ -51,29 +51,29 @@ class MainSettingsVC: UITableViewController, UITableViewDelegate, UIActionSheetD
 				textSize = "\(cacheSize) Б"
 			case 1024 ..< pow(1024, 2):
 				var kb = Float64(cacheSize) / 1024
-				textSize = NSString(format: "%.2f", kb) + " КБ"
+				textSize = (NSString(format: "%.2f", kb) as String) + " КБ"
 			case pow(1024, 2) ..< pow(1024, 3):
 				var mb = Float64(cacheSize) / pow(1024, 2)
-				textSize = NSString(format: "%.2f", mb) + " МБ"
+				textSize = (NSString(format: "%.2f", mb) as String) + " МБ"
 			case pow(1024, 3) ..< pow(1024, 4):
 				var gb = Float64(cacheSize) / pow(1024, 3)
-				textSize = NSString(format: "%.2f", gb) + " ГБ"
+				textSize = (NSString(format: "%.2f", gb) as String) + " ГБ"
 			default: break
 			}
-			(cell.contentView.subviews[1] as UILabel).text = textSize
+			(cell.contentView.subviews[1] as! UILabel).text = textSize
 		}
 	}
 	func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
 		if 0 != buttonIndex { return }
 		API.call("device.revoke", params: "", callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			switch code {
 			case 0:
 				API.code_user = nil
 				Storage.clear()
 				session_key = Crypto.Bytes()
 				
-				var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthEmailVC") as UITableViewController
+				var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthEmailVC") as! UITableViewController
 				self.navigationController?.setViewControllers([ vc ], animated: false)
 			default:
 				API.unknownCode(rdata)

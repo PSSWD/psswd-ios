@@ -30,13 +30,13 @@ class AuthSigninMasterpassVC: UITableViewController
 		] as [String: AnyObject]
 		
 		API.call("device.create", params: params, callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			
 			switch code {
 				case 0:
-					Storage.set(rdata["data"] as String, forKey: "device_id")
+					Storage.set(rdata["data"] as! String, forKey: "device_id")
 				
-					var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSigninConfirmVC") as AuthSigninConfirmVC
+					var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSigninConfirmVC") as! AuthSigninConfirmVC
 					vc.masterpass = masterpass
 					self.navigationController!.pushViewController(vc, animated: true)
 				case 201:

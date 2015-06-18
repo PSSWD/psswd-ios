@@ -32,13 +32,13 @@ class AuthSignupConfirmVC: UITableViewController
 		]
 		
 		API.call("reg.confirm", params: request_data, callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			
 			switch code {
 				case 0:
 					if let data = rdata["data"] as? [String: AnyObject]
 					{
-						let device_id = data["device_id"] as String
+						let device_id = data["device_id"] as! String
 						Storage.set(device_id, forKey: "device_id")
 					
 						Storage.remove("email")
@@ -50,7 +50,7 @@ class AuthSignupConfirmVC: UITableViewController
 						}
 						else
 						{
-							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("MainPassListVC") as UITableViewController
+							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("MainPassListVC") as! UITableViewController
 							self.navigationController!.setViewControllers([ vc ], animated: false)
 						}
 					}

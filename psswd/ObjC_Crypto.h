@@ -10,7 +10,9 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-@interface ObjC_Crypto : NSObject 
+@interface ObjC_Crypto : NSObject
+
++ (NSData*) sha256:(NSData*)data;
 
 + (NSData*) pbkdf2:(NSData*)password
 			  hash:(NSData*)hash

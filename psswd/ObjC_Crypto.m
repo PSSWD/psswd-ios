@@ -10,6 +10,14 @@
 
 @implementation ObjC_Crypto
 
++ (NSData*) sha256:(NSData *)data
+{
+	uint8_t digest[CC_SHA256_DIGEST_LENGTH] = {0};
+	CC_SHA256(data.bytes, (CC_LONG)data.length, digest);
+	NSData *result=[NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
+	return result;
+}
+
 + (NSData*) pbkdf2:(NSData*)password
 			  hash:(NSData*)hash
 		iterations:(int)iterations
@@ -24,54 +32,59 @@
 				   key:(NSData*)key
 					iv:(NSData*)iv
 {
-	//NSLog(@"Key : %@", [key base64EncodedStringWithOptions:0]);
-	//NSLog(@"Key length : %d", key.length);
+	size_t outLength;
+	NSMutableData *cipherData = [NSMutableData dataWithLength:data.length + kCCBlockSizeAES128];
 	
-	//NSLog(@"IV : %@", [iv base64EncodedStringWithOptions:0]);
+	CCCryptorStatus result = CCCrypt(kCCEncrypt,
+									 kCCAlgorithmAES128,
+									 kCCOptionPKCS7Padding,
+									 key.bytes, // key
+									 key.length, // keylength
+									 iv.bytes,// iv
+									 data.bytes, // dataIn
+									 data.length, // dataInLength,
+									 cipherData.mutableBytes, // dataOut
+									 cipherData.length, // dataOutAvailable
+									 &outLength); // dataOutMoved
 	
-	// Encrypt message into base64
-	NSData* message = data;
-	NSMutableData* encrypted = [NSMutableData dataWithLength:message.length + kCCBlockSizeAES128];
-	size_t bytesEncrypted = 0;
-	CCCrypt(kCCEncrypt,
-			kCCAlgorithmAES128,
-			kCCOptionPKCS7Padding,
-			key.bytes,
-			key.length,
-			iv.bytes,
-			message.bytes, message.length,
-			encrypted.mutableBytes, encrypted.length, &bytesEncrypted);
-	NSData* data_encrypted = [NSMutableData dataWithBytes:encrypted.mutableBytes length:bytesEncrypted];
-	//NSString* encrypted64 = [data_encrypted base64EncodedStringWithOptions:0];
-	//NSLog(@"Encrypted : %@", encrypted64);
+	if (result == kCCSuccess) {
+		cipherData.length = outLength;
+	}
+	else {
+		NSLog(@"ERROR");
+		return nil;
+	}
 	
-	return data_encrypted;
+	return cipherData;
 }
 + (NSData*) aesDecrypt:(NSData*)data
 				   key:(NSData*)key
 					iv:(NSData*)iv
 {
-	//NSLog(@"Key : %@", [key base64EncodedStringWithOptions:0]);
-	//NSLog(@"Key length : %d", key.length);
+	size_t outLength;
+	NSMutableData *cipherData = [NSMutableData dataWithLength:data.length + kCCBlockSizeAES128];
 	
-	//NSLog(@"IV : %@", [iv base64EncodedStringWithOptions:0]);
-
-	// Decrypt base 64 into message again
-	NSMutableData* decrypted = [NSMutableData dataWithLength:data.length + kCCBlockSizeAES128];
-	size_t bytesDecrypted = 0;
-	CCCrypt(kCCDecrypt,
-			kCCAlgorithmAES128,
-			kCCOptionPKCS7Padding,
-			key.bytes,
-			key.length,
-			iv.bytes,
-			data.bytes, data.length,
-			decrypted.mutableBytes, decrypted.length, &bytesDecrypted);
-	NSData* outputMessage = [NSMutableData dataWithBytes:decrypted.mutableBytes length:bytesDecrypted];
-	//NSString* output64 = [outputMessage base64EncodedStringWithOptions:0];
-	//NSLog(@"Decrypted : %@", output64);
+	CCCryptorStatus result = CCCrypt(kCCDecrypt,
+									 kCCAlgorithmAES128,
+									 kCCOptionPKCS7Padding,
+									 key.bytes, // key
+									 key.length, // keylength
+									 iv.bytes,// iv
+									 data.bytes, // dataIn
+									 data.length, // dataInLength,
+									 cipherData.mutableBytes, // dataOut
+									 cipherData.length, // dataOutAvailable
+									 &outLength); // dataOutMoved
 	
-	return outputMessage;
+	if (result == kCCSuccess) {
+		cipherData.length = outLength;
+	}
+	else {
+		NSLog(@"ERROR");
+		return nil;
+	}
+	
+	return cipherData;
 }
 
 SecKeyRef publicKey;

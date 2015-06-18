@@ -52,7 +52,7 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 	func loadData()
 	{
 		API.call("passwords.get", params: 0, callback: { rdata in
-			let code = rdata["code"] as Int
+			let code = rdata["code"] as! Int
 			switch code {
 			case 0:
 				var key = Crypto.Bytes(fromString: API.code_user!)
@@ -66,7 +66,7 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 					self.pass_info = []
 					for el in rdata_data
 					{
-						let bytes = el["info_enc"] as Crypto.Bytes
+						let bytes = el["info_enc"] as! Crypto.Bytes
 						let bytes_decrypted = Crypto.Cryptoblender.decrypt(bytes, withKey: key)
 						var pass_info_one = el
 						pass_info_one["info"] = Schemas.utils.schemaBytesToData( bytes_decrypted )
@@ -74,18 +74,18 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 						self.pass_info.append(pass_info_one)
 					}
 					self.pass_info = sorted(self.pass_info, { (obj1: [String: AnyObject], obj2: [String: AnyObject]) -> Bool in
-						let obj1_info = obj1["info"] as [String: AnyObject]
-						var obj1_title = obj1_info["title"] as String
+						let obj1_info = obj1["info"] as! [String: AnyObject]
+						var obj1_title = obj1_info["title"] as! String
 						if "" == obj1_title {
-							let srv = Services.getById(obj1_info["service_id"] as String)
-							obj1_title = srv["title"] as String
+							let srv = Services.getById(obj1_info["service_id"] as! String)
+							obj1_title = srv["title"] as! String
 						}
 						
-						let obj2_info = obj2["info"] as [String: AnyObject]
-						var obj2_title = obj2_info["title"] as String
+						let obj2_info = obj2["info"] as! [String: AnyObject]
+						var obj2_title = obj2_info["title"] as! String
 						if "" == obj2_title {
-							let srv = Services.getById(obj2_info["service_id"] as String)
-							obj2_title = srv["title"] as String
+							let srv = Services.getById(obj2_info["service_id"] as! String)
+							obj2_title = srv["title"] as! String
 						}
 						
 						return obj1_title.lowercaseString < obj2_title.lowercaseString
@@ -121,9 +121,9 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 	{
 		var cell = UITableViewCell(style: .Default, reuseIdentifier: nil)
 		,	data: [String: AnyObject] = tableView == self.searchDisplayController!.searchResultsTableView ? pass_info_sorted[indexPath.row] : pass_info[indexPath.row]
-		,	data_info = data["info"] as [String: AnyObject]
-		,	srv = Services.getById(data_info["service_id"] as String)
-		,	srv_id = srv["id"] as String
+		,	data_info = data["info"] as! [String: AnyObject]
+		,	srv = Services.getById(data_info["service_id"] as! String)
+		,	srv_id = srv["id"] as! String
 		
 		if let srv_icon = srv["icon"] as? Int
 		{
@@ -149,7 +149,7 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 				CGFloat(rowSizes.imageWidth)
 				))
 			view_logo_label.textColor = Funcs.parseHexColorToUIColor(gradient_colors[2])
-			view_logo_label.text = String( Array(srv["title"] as String)[0] )
+			view_logo_label.text = String( Array(srv["title"] as! String)[0] )
 			view_logo_label.textAlignment = NSTextAlignment.Center
 			view_logo_label.font = view_logo_label.font.fontWithSize(25)
 			view_logo.addSubview(view_logo_label)
@@ -158,7 +158,7 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 		}
 		else if "default" != srv_id
 		{
-			let srv_icon = srv["icon"] as String
+			let srv_icon = srv["icon"] as! String
 			var view_logo = UIImageView(frame: CGRectMake(
 				CGFloat(rowSizes.padding.0),
 				CGFloat(rowSizes.padding.1),
@@ -177,8 +177,8 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 			CGFloat(rowSizes.labelWidth),
 			CGFloat(rowSizes.titleHeight)
 			))
-		let view_title_text = data_info["title"] as String
-		view_title.text = view_title_text == "" ? srv["title"] as String : view_title_text
+		let view_title_text = data_info["title"] as! String
+		view_title.text = view_title_text == "" ? srv["title"] as! String : view_title_text
 		view_title.font = view_title.font.fontWithSize(20)
 		cell.contentView.addSubview(view_title)
 
@@ -201,8 +201,8 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 
 		var data: [String: AnyObject] = tableView == self.searchDisplayController!.searchResultsTableView ? pass_info_sorted[indexPath.row] : pass_info[indexPath.row]
 		
-		var vc = self.storyboard?.instantiateViewControllerWithIdentifier("MainPassDetailVC") as MainPassDetailVC
-		vc.pass_id = data["pass_id"] as Int
+		var vc = self.storyboard?.instantiateViewControllerWithIdentifier("MainPassDetailVC") as! MainPassDetailVC
+		vc.pass_id = data["pass_id"] as! Int
 		self.navigationController!.pushViewController(vc, animated: true)
 	}
 	
@@ -228,13 +228,13 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 		
 		for data: [String: AnyObject] in pass_info
 		{
-			var data_info = data["info"] as [String: AnyObject]
-			,	data_info_title = data_info["title"] as String
-			,	srv = Services.getById(data_info["service_id"] as String)
+			var data_info = data["info"] as! [String: AnyObject]
+			,	data_info_title = data_info["title"] as! String
+			,	srv = Services.getById(data_info["service_id"] as! String)
 			,	relev = -1
-			,	keywords = nil == srv["tags"] ? [] : srv["tags"] as [String]
+			,	keywords = nil == srv["tags"] ? [] : srv["tags"] as! [String]
 			keywords.append(data_info_title)
-			keywords.append(data_info["subtitle"] as String)
+			keywords.append(data_info["subtitle"] as! String)
 			keywords = keywords.filter({ NSString(string: $0).rangeOfString(query).location != NSNotFound })
 			//println(keywords)
 			
@@ -254,8 +254,8 @@ class MainPassListVC: UITableViewController, UITableViewDelegate, UITableViewDat
 		//println(pass_info_sorted)
 
 		self.pass_info_sorted = sorted(self.pass_info_sorted, { (obj1: [String: AnyObject], obj2: [String: AnyObject]) -> Bool in
-			let obj1_index = obj1["index"] as Int
-			let obj2_index = obj2["index"] as Int
+			let obj1_index = obj1["index"] as! Int
+			let obj2_index = obj2["index"] as! Int
 			
 			return obj1_index < obj2_index
 		})

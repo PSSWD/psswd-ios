@@ -21,12 +21,12 @@ class AuthSignupMasterpassVC: UITableViewController
 		
 		let masterpass = masterpassField.text
 		
-		if countElements(masterpass) < 10 {
+		if count(masterpass) < 10 {
 			UIAlertView(title: "Ошибка", message: "Мастерпароль слишком короткий. Минимальная длина мастерпароля — 10 символов.", delegate: self, cancelButtonTitle: "OK").show()
 			return
 		}
 		
-		if countElements(masterpass) > 64 {
+		if count(masterpass) > 64 {
 			UIAlertView(title: "Ошибка", message: "Мастерпароль слишком длинный. Максимальная длина мастерпароля — 64 символа.", delegate: self, cancelButtonTitle: "OK").show()
 			return
 		}
@@ -36,10 +36,10 @@ class AuthSignupMasterpassVC: UITableViewController
 			return
 		}
 		
-		var passcodeVC = self.storyboard?.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as SystemPasscodeVC
+		var passcodeVC = self.storyboard?.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as! SystemPasscodeVC
 		passcodeVC.topTitle = "Придумайте пароль"
 		passcodeVC.onSubmit = { (code_user: String) -> Void in
-			var passcodeRetypeVC = self.storyboard?.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as SystemPasscodeVC
+			var passcodeRetypeVC = self.storyboard?.instantiateViewControllerWithIdentifier("SystemPasscodeVC") as! SystemPasscodeVC
 			passcodeRetypeVC.topTitle = "Повторите пароль"
 			passcodeRetypeVC.onSubmit = { (codeRetype: String) -> Void in
 				if code_user != codeRetype {
@@ -84,7 +84,7 @@ class AuthSignupMasterpassVC: UITableViewController
 				
 				API.call("reg.start", params: requestData, callback: { rdata in
 				
-					let code = rdata["code"] as Int
+					let code = rdata["code"] as! Int
 
 					switch code {
 						case 0:
@@ -94,7 +94,7 @@ class AuthSignupMasterpassVC: UITableViewController
 						
 							API.code_user = code_user
 						
-							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupConfirmVC") as UITableViewController
+							var vc = self.storyboard?.instantiateViewControllerWithIdentifier("AuthSignupConfirmVC") as! UITableViewController
 							self.navigationController!.pushViewController(vc, animated: true)
 						default:
 							API.unknownCode(rdata)
@@ -109,7 +109,7 @@ class AuthSignupMasterpassVC: UITableViewController
 	private func randomString(length: Int) -> String {
 		var syms = Array("0123456789" + "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "!@#$%&§.")
 		var res = ""
-		while countElements(res) < length {
+		while count(res) < length {
 			res = "\(res)\(syms[ Int( MTRandom().randomUInt32From(0, to: UInt32(syms.count - 1)) ) ])"
 		}
 		return res

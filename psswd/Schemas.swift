@@ -26,7 +26,7 @@ class Schemas {
 		
 		if needUpdate
 		{
-			Funcs.jsonData.update("schemas", {
+			Funcs.jsonData.update("schemas", callback: {
 				self.create(needUpdate: false)
 			})
 		}
@@ -34,7 +34,7 @@ class Schemas {
 
 	class utils {
 		private class func getBytesFromData(field: [String: AnyObject], data: AnyObject?) -> Crypto.Bytes {
-			var field_type: String = field["type"] as String
+			var field_type: String = field["type"] as! String
 			,	response = Crypto.Bytes()
 			let data_class = data == nil ? "" : _stdlib_getDemangledTypeName(data!)
 			
@@ -45,10 +45,11 @@ class Schemas {
 					}
 					else {
 						assert(
-							data_class == "__NSCFNumber"
-						||	data_class == "Swift.Int"
+							/*data_class == "__NSCFNumber"
+						||	data_class == "Swift.Int"*/
+							data is Int
 						, "Invalid type. Expected some integer, '\(data_class)' given.")
-						let data_typed: Int = data as Int
+						let data_typed: Int = data as! Int
 						assert(data_typed <= 65535, "Object too large.")
 						response.append(UInt8(Int(floor(Double(data_typed/256)))%256), UInt8(data_typed%256))
 					}
@@ -58,10 +59,11 @@ class Schemas {
 					}
 					else {
 						assert(
-							data_class == "Swift.Int"
-						||	data_class == "__NSCFNumber"
+							/*data_class == "Swift.Int"
+						||	data_class == "__NSCFNumber"*/
+							data is Int
 						, "Invalid type. Expected some integer, '\(data_class)' given.")
-						var data_typed: Int = data as Int
+						var data_typed: Int = data as! Int
 
 						response = Schemas.getBytesWithLength(Crypto.Bytes(fromNumber: data_typed), Schemas.getLengthByType(field_type))
 					}
@@ -69,12 +71,13 @@ class Schemas {
 					var data_bytes = Crypto.Bytes()
 					if data != nil {
 						assert(
-							data_class == "__NSCFString"
+							/*data_class == "__NSCFString"
 						||	data_class == "__NSCFConstantString"
 						||	data_class == "Swift.String"
-						||	data_class == "Swift._NSContiguousString"
+						||	data_class == "Swift._NSContiguousString"*/
+							data is String
 						, "Invalid type. Expected some string, '\(data_class)' given.")
-						let data_typed: String = data as String
+						let data_typed: String = data as! String
 					
 						for scalar in data_typed.unicodeScalars {
 							assert(scalar.value < 65536, "Unsupported symbol.")
@@ -85,8 +88,8 @@ class Schemas {
 					response = Schemas.getBytesWithLength(data_bytes, Schemas.getLengthByType(field_type))
 				case "bytes":
 					if data != nil {
-						assert(data_class == "psswd.Crypto.Bytes", "Invalid type. Expected 'psswd.Crypto.Bytes', '\(data_class)' given.")
-						response = Schemas.getBytesWithLength(data as Crypto.Bytes, Schemas.getLengthByType(field_type))
+						assert(/*data_class == "psswd.Crypto.Bytes"*/ data is Crypto.Bytes, "Invalid type. Expected 'psswd.Crypto.Bytes', '\(data_class)' given.")
+						response = Schemas.getBytesWithLength(data as! Crypto.Bytes, Schemas.getLengthByType(field_type))
 					}
 					else {
 						response = Schemas.getBytesWithLength(Crypto.Bytes(), Schemas.getLengthByType(field_type))
@@ -95,12 +98,14 @@ class Schemas {
 					var data_bytes = Crypto.Bytes()
 					if data != nil {
 						assert(
-							data_class == "Swift.Array"
+							/*data_class == "Swift.Array"
 						||	data_class == "Swift._NSSwiftArrayImpl"
+						||	data_class == "Swift._SwiftDeferredNSArray"*/
+							data is [AnyObject]
 						, "Invalid type. Expected some array, '\(data_class)' given.")
 						if let data_typed = data as? [AnyObject] {
 							for v in data_typed {
-								data_bytes.append(getBytesFromData(field["fields"] as [String: AnyObject], data: v))
+								data_bytes.append(getBytesFromData(field["fields"] as! [String: AnyObject], data: v))
 							}
 						}
 					}
@@ -109,14 +114,16 @@ class Schemas {
 					var data_bytes = Crypto.Bytes()
 					if data != nil {
 						assert(
-							data_class == "__NSDictionaryI"
+							/*data_class == "__NSDictionaryI"
 						||	data_class == "Swift._NativeDictionaryStorageOwner"
+						||	data_class == "Swift._NativeDictionaryStorageOwner<Swift.String, Swift.AnyObject>"*/
+							data is [String: AnyObject]
 						, "Invalid type. Expected some dictionary, '\(data_class)' given.")
 					
 						if let data_typed = data as? [String: AnyObject] {
-							var field_fields = field["fields"] as [[String: AnyObject]]
+							var field_fields = field["fields"] as! [[String: AnyObject]]
 							for field_in in field_fields {
-								let field_in_name = field_in["name"] as String
+								let field_in_name = field_in["name"] as! String
 								data_bytes.append( getBytesFromData(field_in, data: data_typed[field_in_name]) )
 							}
 						}
@@ -129,12 +136,12 @@ class Schemas {
 		}
 		class func dataToSchemaBytes(schema_id: Int, input_data: AnyObject) -> Crypto.Bytes {
 			var bytes = Crypto.Bytes()
-			var current_schema = classVar.list[schema_id] as [String: AnyObject]
+			var current_schema = classVar.list[schema_id] as! [String: AnyObject]
 
 			bytes.append(Int(floor(Double(schema_id / 256))), schema_id % 256)
 			
 			var data_bytes = getBytesFromData(current_schema, data: input_data)
-			data_bytes = data_bytes.slice( Schemas.getLengthByType(current_schema["type"] as String) )
+			data_bytes = data_bytes.slice( Schemas.getLengthByType(current_schema["type"] as! String) )
 			
 			bytes.append(data_bytes)
 
@@ -143,7 +150,7 @@ class Schemas {
 		
 		private class func getDataFromBytes(field: [String: AnyObject], data_bytes: Crypto.Bytes) -> AnyObject {
 			var response: AnyObject = 0
-			var field_type: String = field["type"] as String
+			var field_type: String = field["type"] as! String
 			
 			switch field_type {
 				case "tinynum", "number":
@@ -170,9 +177,9 @@ class Schemas {
 						return bytes
 					}
 					var content: [AnyObject] = []
-					let field_fields = field["fields"] as [String: AnyObject]
-					let field_fields_type = field_fields["type"] as String
-					while array_current_byte < array_bytes.count {
+					let field_fields = field["fields"] as! [String: AnyObject]
+					let field_fields_type = field_fields["type"] as! String
+					while array_current_byte < array_bytes.length {
 						content.append(getDataFromBytes(field_fields, data_bytes: array_getBytes(field_fields_type)))
 					}
 					response = content
@@ -194,9 +201,9 @@ class Schemas {
 						return bytes
 					}
 					var content: [String: AnyObject] = [:]
-					let field_fields = field["fields"] as [[String: AnyObject]]
+					let field_fields = field["fields"] as! [[String: AnyObject]]
 					for field_in in field_fields {
-						content[field_in["name"] as String] = getDataFromBytes(field_in, data_bytes: object_getBytes(field_in["type"] as String))
+						content[field_in["name"] as! String] = getDataFromBytes(field_in, data_bytes: object_getBytes(field_in["type"] as! String))
 					}
 					response = content
 				default:
@@ -207,11 +214,11 @@ class Schemas {
 		}
 		
 		class func schemaBytesToData(schema_bytes: Crypto.Bytes) -> AnyObject {
-			assert(schema_bytes.count > 2, "Invalid bytes passed.")
+			assert(schema_bytes.length > 2, "Invalid bytes passed.")
 
 			let schema_id = schema_bytes.slice(0, length: 2).toNumber()
 			
-			let field = classVar.list[schema_id] as [String: AnyObject]
+			let field = classVar.list[schema_id] as! [String: AnyObject]
 			
 			var output_data: AnyObject = getDataFromBytes(field, data_bytes: schema_bytes.slice(2))
 			
@@ -234,12 +241,12 @@ class Schemas {
 			return bytes
 		}
 		
-		var length = bytes.count
+		var length = bytes.length
 		assert(Int64(length) <= Int64(pow(Double(256), Double(bytes_for_length))), "Schemas.getBytesWithLength(): Object too large.")
 		
 		var res = Crypto.Bytes(fromNumber: length)
 		//println( res.asArray() )
-		while bytes_for_length != res.count { res = Crypto.Bytes(given: [0]).concat(res) }
+		while bytes_for_length != res.length { res = Crypto.Bytes(given: [0]).concat(res) }
 		//println( res.asArray() )
 		res.append(bytes)
 		//println( res.asArray() )
